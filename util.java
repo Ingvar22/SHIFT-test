@@ -183,6 +183,10 @@ public class util {
                     stat = 'f';
                     break;
                 } default: {
+                    if(!args[i].endsWith(".txt")) {
+                        System.out.println("Введите файлы необходимого расщирения(.txt)");
+                        System.exit(0);
+                    }
                     listFiles.add(args[i]);
                 }
             }
@@ -193,10 +197,10 @@ public class util {
             System.exit(0);
         }
 
-        if(path.charAt(path.length()-1) != '/') path += '/';
+        if(!path.isEmpty() && path.charAt(path.length()-1) != '/') path += '/';
 
         File directory = new File(path);
-        if(!directory.exists()) {
+        if(!path.isEmpty() && !directory.exists()) {
             if(directory.mkdirs()) {
                 System.out.println("Директория создана: " + path);
             } else System.out.println("Не удалось создать директорию: " + path);
@@ -210,14 +214,26 @@ public class util {
                 if(file.exists()) {
                     if(file.delete()) {
                         System.out.println(" перезаписан.");
-                    } else System.out.println(" добавились новые данные.");
+                    }
                 } else if(path.isEmpty()) System.out.println(" добавлен в текущую директорию.");
                 else System.out.println(" в путь " + path);
+            }
+        } else {
+            File file;
+            for(String fileName : nameResFiles) {
+                file = new File(path + prefix + fileName);
+                if(file.exists()) {
+                    System.out.println(prefix+fileName + " добавились новые данные.");
+                } else {
+                    System.out.println("Невозможно добавить новые данные.\n" +
+                            "В данной директории нет файла для взаимодейсвия.");
+                    System.exit(0);
+                }
             }
         }
 
         for(String fileName : listFiles) {
-            try(BufferedReader reader = new BufferedReader(new FileReader(fileName+".txt"))) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
                 fileProcessing(reader, path, prefix, nameResFiles, stat);
             } catch (IOException ex) {
                 System.out.println("Ошибка при чтении файла: " + ex.getMessage());
