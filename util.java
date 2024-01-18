@@ -17,6 +17,7 @@ public class util {
     public static int maxLenStr = 0, minLenStr = 0;
     public static String minStr = "";
 
+    //Long и Double, т.к. могут быть использованы большие числа
     public static boolean isInteger(String line)
     {
         try {
@@ -26,7 +27,7 @@ public class util {
             return false;
         }
     }
-
+    
     public static boolean isFloat(String line) {
         try {
             Double.parseDouble(line);
@@ -59,10 +60,9 @@ public class util {
         System.out.println("\n#############################\n");
     }
 
-
     public static void fileProcessing(BufferedReader reader, String path, String prefix, String[] nameResFiles, char stat) {
         try {
-            String line = reader.readLine();
+            String line = reader.readLine(); //Читаем файл построчно
             while(line != null)
             {
                 try {
@@ -83,6 +83,8 @@ public class util {
         }
     }
 
+    //Записываем в файл с результатами, если есть такой тип данных
+    //Статистика ведется если была указана опция
     public static void integerProcessing(String line, String path, String prefix, String nameResFile, char stat) throws IOException{
         try (FileWriter writer = new FileWriter(path + prefix + nameResFile, true)) {
             if(stat == 's' || stat == 'f') {
@@ -192,13 +194,16 @@ public class util {
             }
         }
 
+        //Проверяем были ли введены файлы источники
         if(listFiles.isEmpty()){
             System.out.println("Файл(ы) не был(и) введены.");
             System.exit(0);
         }
 
+        //Редактируем путь в директорию файлов с результатами 
         if(!path.isEmpty() && path.charAt(path.length()-1) != '/') path += '/';
 
+        //Если директории не существует то создаем ее
         File directory = new File(path);
         if(!path.isEmpty() && !directory.exists()) {
             if(directory.mkdirs()) {
@@ -206,6 +211,7 @@ public class util {
             } else System.out.println("Не удалось создать директорию: " + path);
         }
 
+        //Если была указана опция -a то в файлы с результатами будут добавлены новые данные
         if(writeFormat) {
             File file;
             for(String fileName : nameResFiles) {
@@ -232,6 +238,8 @@ public class util {
             }
         }
 
+        // Создаем потоки для чтения текста из файла для каждого файла источника по очереди,
+        // и отправляем на обработку.
         for(String fileName : listFiles) {
             try(BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
                 fileProcessing(reader, path, prefix, nameResFiles, stat);
@@ -239,6 +247,6 @@ public class util {
                 System.out.println("Ошибка при чтении файла: " + ex.getMessage());
             }
         }
-        if(stat != ' ') printStatistic(stat);
+        if(stat != ' ') printStatistic(stat); //Если опция указана не была сатистика не выведится
     }
 }
